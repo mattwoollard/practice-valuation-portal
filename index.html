@@ -129,6 +129,16 @@ nav.steps button:disabled { opacity:.45; cursor:not-allowed; } nav.steps button:
     <li><b>Add your financials and upload documents.</b> Headline figures, how the owners pay themselves, then your P&amp;Ls, billing report, fixed asset register, wages and lease.</li>
     <li><b>Review and submit.</b> Check your answers and submit them to the Sonic valuation team, who will contact you if they have questions.</li>
   </ol>
+  <h3>Your details</h3>
+  <p class="lead" style="margin-bottom:12px">You are the person completing the valuation information and signing the confidentiality agreement. Your details carry through to the agreement on the next page, where you can add anyone else who needs to be covered.</p>
+  <div class="grid" id="meGrid">
+    <div><label class="f">Your full name</label><input type="text" data-k="me_name" autocomplete="name"></div>
+    <div><label class="f">Your role<small>For example owner, director or practice manager</small></label><input type="text" data-k="me_role" autocomplete="organization-title"></div>
+    <div><label class="f">Email</label><input type="email" data-k="me_email" autocomplete="email"></div>
+    <div><label class="f">Mobile</label><input type="text" data-k="me_phone" autocomplete="tel"></div>
+    <div class="full"><label class="f">Practice name<small>The medical centre you are representing</small></label><input type="text" data-k="trading_name"></div>
+  </div>
+  <div class="err hide" id="meErr"></div>
   <div class="note"><b>Before you start, it helps to have:</b> your P&amp;L for the valuation period and the last 3 financial years, a billing report showing gross billings by doctor, your fixed asset register, a wages breakdown, and your lease.</div>
   <div class="grid">
     <div><label class="f">Valuation period start<small>A 12 month period: financial year, calendar year or the last 12 months</small></label><input type="date" data-k="period_start"></div>
@@ -155,7 +165,7 @@ nav.steps button:disabled { opacity:.45; cursor:not-allowed; } nav.steps button:
   <div class="agr" id="agrText"></div>
 
   <h3>People or companies covered, and signatures</h3>
-  <p class="lead" style="margin-bottom:10px">List each person or company covered by the agreement, signing as authorised representatives where applicable. Each person clicks Sign and draws or types their signature. The date, time and signer details are recorded on a signing certificate attached to the PDF.</p>
+  <p class="lead" style="margin-bottom:10px">You are listed first, from the Welcome page. Add anyone else who needs to be covered, signing as authorised representatives where applicable. Each person clicks Sign and draws or types their signature. The date, time and signer details are recorded on a signing certificate attached to the PDF.</p>
   <div class="scroll"><table class="rows" data-table="signers"><thead><tr><th style="width:26px">#</th><th>Full name</th><th>Company or role</th><th>Email for your copy</th><th>Signature</th></tr></thead><tbody></tbody></table></div>
   <button class="btn link" data-add="signers" id="addSigner">+ Add another person (up to 4)</button>
   <div class="note" id="ndaAgreeBox"><label style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="ndaAgree" style="margin-top:3px"> I have read the Mutual Confidentiality Agreement, and each person signing above is authorised to sign it for the party they represent.</label></div>
@@ -577,8 +587,20 @@ function progress(){ const fields=[...document.querySelectorAll('[data-k]')]; co
   const docs=Object.keys(state.docs||{}).length; const pct=Math.round(100*(filled+docs)/(fields.length+5)); const p=Math.min(pct,100);
   document.getElementById('bar').style.width=p+'%'; document.getElementById('ptxt').textContent=p+'% complete'; }
 
-function go(i){ if(i>1 && !state.nda) i=1; cur=i; sections.forEach((s,j)=>s.classList.toggle('on',j===i));
-  [...nav.querySelectorAll('button')].forEach((b,j)=>{ b.classList.toggle('on',j===i); b.classList.toggle('done',j<i || (j===1 && !!state.nda)); b.disabled=(j>1 && !state.nda); });
+
+// welcome: the person completing and signing
+function meErr(m){ const e=document.getElementById('meErr'); e.textContent=m||''; e.classList.toggle('hide',!m); }
+function welcomeOk(show){ const t=k=>(state[k]||'').trim(); let m='';
+  if(!t('me_name')) m='Please enter your full name.'; else if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(t('me_email'))) m='Please enter a valid email address.'; else if(!t('trading_name')) m='Please enter the practice name.';
+  if(show) meErr(m); return !m; }
+function syncMe(){ if(state.nda) return; const tr=document.querySelector('[data-table="signers"] tbody tr'); if(!tr) return;
+  const want={name:(state.me_name||'').trim(), role:(state.me_role||'').trim(), email:(state.me_email||'').trim()}; let changed=false;
+  Object.entries(want).forEach(([k,v])=>{ const el=tr.querySelector('[data-col="'+k+'"]'); if(el.value!==v){ el.value=v; changed=true; } el.readOnly=true; el.title='From your details on the Welcome page'; });
+  if(changed){ if(state.sigs&&state.sigs[0]){ delete state.sigs[0]; } saveTable('signers'); renderSigCells(); }
+  if(!state.contact){ state.contact=want.name; } if(!state.contact_details){ state.contact_details=[want.email,(state.me_phone||'').trim()].filter(Boolean).join(', '); }
+  document.querySelectorAll('[data-k="contact"]').forEach(e=>e.value=state.contact||''); document.querySelectorAll('[data-k="contact_details"]').forEach(e=>e.value=state.contact_details||''); persist(); }
+function go(i){ if(i>0 && !welcomeOk(true)) i=0; else if(i>0) syncMe(); if(i>1 && !state.nda) i=1; cur=i; sections.forEach((s,j)=>s.classList.toggle('on',j===i));
+  [...nav.querySelectorAll('button')].forEach((b,j)=>{ b.classList.toggle('on',j===i); b.classList.toggle('done',j<i || (j===1 && !!state.nda)); b.disabled=(j>1 && !state.nda) || (j===1 && !welcomeOk(false)); });
   document.getElementById('foot').style.display=i>last?'none':'flex';
   document.getElementById('prev').style.visibility=i===0?'hidden':'visible';
   document.getElementById('next').textContent=i===last?'Submit to Sonic':(i===0?'Start':(i===1?(state.nda?'Continue':'Finish signing'):'Save and continue'));
@@ -586,9 +608,9 @@ function go(i){ if(i>1 && !state.nda) i=1; cur=i; sections.forEach((s,j)=>s.clas
   document.getElementById('next').className='btn '+(i===last?'r':'p');
   if(i===last) summary(); progress(); window.scrollTo(0,0); }
 document.getElementById('prev').onclick=()=>go(Math.max(0,cur-1));
-document.getElementById('next').onclick=()=>{ if(cur===last){ if(!document.getElementById('declare').checked){ alert('Please tick the declaration before submitting.'); return; } go(last+1); return; } if(cur===1 && !state.nda){ signNda(); return; } persist(); go(cur+1); };
+document.getElementById('next').onclick=()=>{ if(cur===last){ if(!document.getElementById('declare').checked){ alert('Please tick the declaration before submitting.'); return; } go(last+1); return; } if(cur===1 && !state.nda){ signNda(); return; } if(cur===0 && !welcomeOk(true)) return; persist(); go(cur+1); };
 document.getElementById('savebtn').onclick=()=>{ persist(); alert('Your progress is saved. In the live portal you would get an email with a link to come back and finish.'); };
-document.addEventListener('input',progress);
+document.addEventListener('input',()=>{ progress(); if(cur===0){ const b=nav.querySelectorAll('button')[1]; if(b) b.disabled=!welcomeOk(false); if(welcomeOk(false)) meErr(''); } });
 go(0);
 </script>
 </body>
