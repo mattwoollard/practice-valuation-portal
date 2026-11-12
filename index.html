@@ -63,7 +63,7 @@ table.rows select { min-width:96px; } table.rows input[type=number] { min-width:
 .drop .tag.opt { background:var(--soft); color:var(--muted); }
 .drop.has { border-color:var(--ok); border-style:solid; background:#f2faf6; }
 .files { font-size:12.5px; color:var(--ok); }
-.cards { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0; }
+.cards { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:16px 0; }
 .card { background:var(--soft); border-radius:9px; padding:14px; }
 .card b { color:var(--navy); display:block; margin-bottom:4px; }
 .card span { font-size:13px; color:var(--muted); line-height:1.4; }
@@ -75,8 +75,24 @@ table.rows select { min-width:96px; } table.rows input[type=number] { min-width:
 .agr h4 { color:var(--navy); margin:14px 0 4px; font-size:13.5px; } .agr p { margin:4px 0; } .agr .a { padding-left:24px; } .agr .i { padding-left:48px; } .agr .c { text-align:center; font-weight:700; color:var(--navy); }
 .sig { font-family:"Brush Script MT","Segoe Script","Snell Roundhand",cursive; font-size:25px; color:#0b2a63; line-height:1.1; }
 input.sigin { font-family:"Brush Script MT","Segoe Script","Snell Roundhand",cursive; font-size:19px; color:#0b2a63; }
-.signedby { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
-.signedby div { background:var(--soft); border-radius:8px; padding:10px 14px; } .signedby small { display:block; color:var(--muted); font-size:12px; margin-top:4px; }
+.signedby { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.sigframe { border:1px solid #c7d2e3; border-left:3px solid var(--navy); border-radius:6px; padding:6px 12px 8px; background:#fff; }
+.sigframe .lbl { font-size:11px; color:var(--muted); } .sigframe .img { height:46px; display:flex; align-items:center; } .sigframe .img img { max-height:46px; max-width:100%; }
+.sigframe .ph { font-size:12px; color:#8a97a6; font-style:italic; } .sigframe .id { font-size:10.5px; color:var(--muted); font-family:Menlo,monospace; }
+.sigframe .who { font-size:13px; font-weight:600; color:var(--ink); margin-top:4px; } .sigframe .who small { font-weight:400; color:var(--muted); display:block; font-size:12px; }
+td.sigcell { min-width:190px; } td.sigcell img { height:34px; display:block; } td.sigcell small { color:var(--ok); font-size:11.5px; }
+.modal { position:fixed; inset:0; background:rgba(15,25,45,.55); display:flex; align-items:center; justify-content:center; z-index:50; padding:16px; }
+.mbox { background:#fff; border-radius:12px; padding:22px 24px; width:100%; max-width:620px; max-height:95vh; overflow:auto; }
+.tabs { display:flex; gap:6px; margin:10px 0 12px; border-bottom:1px solid var(--line); }
+.tabs button { border:0; background:none; padding:8px 14px; font:inherit; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:3px solid transparent; }
+.tabs button.on { color:var(--navy); border-bottom-color:var(--navy); }
+#sigPad { width:100%; height:170px; border:1px dashed #9fb0c8; border-radius:8px; background:#fbfcfe; touch-action:none; cursor:crosshair; display:block; }
+#sigPreview { border:1px dashed #9fb0c8; border-radius:8px; height:110px; display:flex; align-items:center; padding:0 18px; margin-top:10px; font-size:42px; background:#fbfcfe; }
+.consent { display:flex; gap:8px; align-items:flex-start; font-size:13.5px; line-height:1.45; margin:14px 0 4px; }
+.steplist { margin:6px 0 16px; padding:0; list-style:none; counter-reset:st; }
+.steplist li { position:relative; padding:10px 0 10px 44px; border-bottom:1px solid var(--line); line-height:1.45; }
+.steplist li:before { counter-increment:st; content:counter(st); position:absolute; left:4px; top:10px; width:26px; height:26px; border-radius:50%; background:var(--navy); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.steplist b { color:var(--navy); }
 .okbox { background:#f2faf6; border-left:3px solid var(--ok); padding:14px 16px; border-radius:0 8px 8px 0; margin:16px 0; font-size:14px; line-height:1.5; }
 .okbox b.t { color:var(--ok); display:block; font-size:15px; margin-bottom:4px; }
 .mail { background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px 14px; margin-top:10px; font-size:13px; }
@@ -85,7 +101,7 @@ input.sigin { font-family:"Brush Script MT","Segoe Script","Snell Roundhand",cur
 nav.steps button:disabled { opacity:.45; cursor:not-allowed; } nav.steps button:disabled:hover { background:none; }
 #nda input[readonly], #nda select:disabled { background:#f5f7fa; }
 .hide { display:none !important; }
-@media (max-width:860px) { .wrap { grid-template-columns:1fr; } nav.steps { position:static; } .grid, .cards, .signedby { grid-template-columns:1fr; } }
+@media (max-width:860px) { .wrap { grid-template-columns:1fr; } nav.steps { position:static; } .grid, .cards, .signedby { grid-template-columns:1fr; } .mbox { padding:16px; } }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -101,17 +117,33 @@ nav.steps button:disabled { opacity:.45; cursor:not-allowed; } nav.steps button:
 
 <main id="main">
 
-<section data-title="Confidentiality agreement" id="nda">
-  <span class="badge">Step one</span>
-  <h1>Mutual Confidentiality Agreement</h1>
-  <p class="lead">Before you share any information with us, please sign the confidentiality agreement below. Sonic has already signed it. Enter your practice details and the people covered by the agreement, then sign. A signed PDF copy is emailed to you straight away and saved with your documents, before you go any further.</p>
-
-  <h3>Already signed by Matrix Skin Cancer Clinics Pty Ltd</h3>
-  <div class="signedby">
-    <div><span class="sig">Matthew Woollard</span><small>Matthew Woollard, authorised representative</small></div>
-    <div><span class="sig">George Southgate</span><small>George Southgate, authorised representative</small></div>
-    <div><b style="color:var(--navy)">Date signed</b><small id="sentDate" style="font-size:14px;color:var(--ink)"></small></div>
+<section data-title="Welcome">
+  <span class="badge">Confidential</span>
+  <h1>Welcome to the Sonic Clinical Services valuation portal</h1>
+  <p class="lead">Thank you for considering a partnership with Sonic Clinical Services. This portal collects the information we need to value your practice. Your answers save as you go, so you can leave at any time and come back to finish later.</p>
+  <h3>How the process works</h3>
+  <ol class="steplist">
+    <li><b>Sign the confidentiality agreement.</b> Before you share anything, you and Sonic sign a Mutual Confidentiality Agreement. Sonic has already signed it. You sign electronically on the next page, and a signed PDF copy is emailed to you straight away.</li>
+    <li><b>Tell us about the practice.</b> Locations, premises, patients, clinical workflow and fees. Most questions take a short answer.</li>
+    <li><b>Add your doctors and staff.</b> One row per doctor and per employee. This replaces the Doctor Information and Employee Information forms.</li>
+    <li><b>Add your financials and upload documents.</b> Headline figures, how the owners pay themselves, then your P&amp;Ls, billing report, fixed asset register, wages and lease.</li>
+    <li><b>Review and submit.</b> Check your answers and submit them to the Sonic valuation team, who will contact you if they have questions.</li>
+  </ol>
+  <div class="note"><b>Before you start, it helps to have:</b> your P&amp;L for the valuation period and the last 3 financial years, a billing report showing gross billings by doctor, your fixed asset register, a wages breakdown, and your lease.</div>
+  <div class="grid">
+    <div><label class="f">Valuation period start<small>A 12 month period: financial year, calendar year or the last 12 months</small></label><input type="date" data-k="period_start"></div>
+    <div><label class="f">Valuation period end</label><input type="date" data-k="period_end"></div>
   </div>
+  <div class="note">Everything you provide is treated as confidential under the Mutual Confidentiality Agreement and is only shared with the Sonic team preparing your valuation. Please do not upload any patient names or clinical records.</div>
+</section>
+
+<section data-title="Confidentiality agreement" id="nda">
+  <span class="badge">Before you share any information</span>
+  <h1>Mutual Confidentiality Agreement</h1>
+  <p class="lead">Sonic has already signed this agreement. Enter your practice details and the people covered by it, read the agreement, then each person signs electronically. As soon as it is signed, a signed PDF copy and a signing certificate are emailed to you and saved with your documents, before you go any further.</p>
+
+  <h3>Already signed by Matrix Skin Cancer Clinics Pty Ltd (two authorised representatives)</h3>
+  <div class="signedby" id="sonicSigs"></div>
 
   <h3>Your practice</h3>
   <div class="grid">
@@ -123,30 +155,13 @@ nav.steps button:disabled { opacity:.45; cursor:not-allowed; } nav.steps button:
   <div class="agr" id="agrText"></div>
 
   <h3>People or companies covered, and signatures</h3>
-  <p class="lead" style="margin-bottom:10px">List each person or company covered by the agreement, signing as authorised representatives where applicable. To sign, type your full name exactly as entered. The signing date and time are recorded automatically.</p>
-  <div class="scroll"><table class="rows" data-table="signers"><thead><tr><th style="width:26px">#</th><th>Full name</th><th>Company or role</th><th>Email for your copy</th><th>Signature (type your full name)</th></tr></thead><tbody></tbody></table></div>
+  <p class="lead" style="margin-bottom:10px">List each person or company covered by the agreement, signing as authorised representatives where applicable. Each person clicks Sign and draws or types their signature. The date, time and signer details are recorded on a signing certificate attached to the PDF.</p>
+  <div class="scroll"><table class="rows" data-table="signers"><thead><tr><th style="width:26px">#</th><th>Full name</th><th>Company or role</th><th>Email for your copy</th><th>Signature</th></tr></thead><tbody></tbody></table></div>
   <button class="btn link" data-add="signers" id="addSigner">+ Add another person (up to 4)</button>
   <div class="note" id="ndaAgreeBox"><label style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="ndaAgree" style="margin-top:3px"> I have read the Mutual Confidentiality Agreement, and each person signing above is authorised to sign it for the party they represent.</label></div>
   <div class="err hide" id="ndaErr"></div>
 
   <div class="okbox hide" id="ndaDone"></div>
-</section>
-
-<section data-title="Welcome">
-  <span class="badge">Confidential</span>
-  <h1>Welcome to the Sonic Clinical Services valuation portal</h1>
-  <p class="lead">Thank you for considering a partnership with Sonic Clinical Services. This portal collects the information we need to value your practice. Your answers save as you go, so you can leave at any time and come back to finish later.</p>
-  <div class="cards">
-    <div class="card"><b>1. Tell us about the practice</b><span>Locations, premises, patients, workflow and fees. Most questions take a short answer.</span></div>
-    <div class="card"><b>2. Add your doctors and staff</b><span>One row per doctor and per employee. This replaces the Doctor Information and Employee Information forms.</span></div>
-    <div class="card"><b>3. Upload your documents</b><span>P&amp;Ls, billing reports, fixed asset register and lease. Then review and submit.</span></div>
-  </div>
-  <div class="note"><b>Before you start, it helps to have:</b> your P&amp;L for the valuation period and the last 3 financial years, a billing report showing gross billings by doctor, your fixed asset register, a wages breakdown, and your lease.</div>
-  <div class="grid">
-    <div><label class="f">Valuation period start<small>A 12 month period: financial year, calendar year or the last 12 months</small></label><input type="date" data-k="period_start"></div>
-    <div><label class="f">Valuation period end</label><input type="date" data-k="period_end"></div>
-  </div>
-  <div class="note">Everything you provide is treated as confidential under the Mutual Confidentiality Agreement you signed in step one and is only shared with the Sonic team preparing your valuation. Please do not upload any patient names or clinical records.</div>
 </section>
 
 <section data-title="Practice details">
@@ -315,6 +330,15 @@ nav.steps button:disabled { opacity:.45; cursor:not-allowed; } nav.steps button:
   <div><button class="btn link" id="savebtn" style="margin-right:14px">Save and finish later</button><button class="btn p" id="next">Save and continue</button></div></div>
 </main>
 </div>
+<div class="modal hide" id="sigModal"><div class="mbox">
+  <h2>Adopt your signature</h2><p class="lead" id="sigWho" style="margin:0"></p>
+  <div class="tabs"><button type="button" data-m="draw" class="on">Draw</button><button type="button" data-m="type">Type</button></div>
+  <div id="mDraw"><canvas id="sigPad"></canvas><div style="display:flex;justify-content:space-between"><small style="color:var(--muted)">Draw with your mouse, trackpad or finger</small><button type="button" class="btn link" id="sigClear">Clear</button></div></div>
+  <div id="mType" class="hide"><label class="f">Type your full name</label><input type="text" id="sigTypeIn"><div id="sigPreview" class="sig"></div></div>
+  <label class="consent"><input type="checkbox" id="sigConsent" style="margin-top:3px"> <span>I agree to sign this agreement electronically. My electronic signature is legally binding, the same as my handwritten signature. <small style="color:var(--muted);display:block">Electronic Transactions Act 1999 (Cth). The date, time and your details are recorded on the signing certificate.</small></span></label>
+  <div class="err hide" id="sigErr"></div>
+  <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px"><button type="button" class="btn s" id="sigCancel">Cancel</button><button type="button" class="btn p" id="sigAdopt">Adopt and sign</button></div>
+</div></div>
 <div class="mock">Mock-up only: nothing is sent anywhere</div>
 
 <script>
@@ -336,7 +360,7 @@ const TABLES={
   locations:[['addr','text'],['consult','number'],['proc','number'],['sqm','number'],['parks','number'],['shared','sel:,No,Yes']],
   doctors:[['name','text'],['prov','text'],['role','sel:,Owner,Associate'],['status','sel:,Current,Departing,Starting'],['vr','sel:,VR,Non VR'],['start','date'],['hrs','number'],['leave','number'],['pct','number'],['gb','number'],['contract','sel:,Fixed,Flexible'],['visa','sel:,No,Yes'],['inc','text']],
   normalisation:[['exp','text'],['line','text'],['amt','number'],['type','sel:,Owner personal expense,Family member wage,One off cost,Above market rent,Other'],['cmt','text']],
-  signers:[['name','text'],['role','text'],['email','email'],['sig','text']],
+  signers:[['name','text'],['role','text'],['email','email']],
   staff:[['name','text'],['pos','text'],['emp','sel:,Full time,Part time,Casual'],['start','date'],['hrs','number'],['rate','number'],['al','number'],['lsl','number'],['sick','number'],['other','text']]
 };
 function addRow(t, vals={}){ const tb=document.querySelector('[data-table="'+t+'"] tbody'); const tr=document.createElement('tr');
@@ -344,8 +368,9 @@ function addRow(t, vals={}){ const tb=document.querySelector('[data-table="'+t+'
   TABLES[t].forEach(([k,type])=>{ const td=document.createElement('td'); let el;
     if(type.startsWith('sel:')){ el=document.createElement('select'); type.slice(4).split(',').forEach(o=>{ const op=document.createElement('option'); op.textContent=o; el.appendChild(op); }); }
     else { el=document.createElement('input'); el.type=type; if(type==='text') el.style.minWidth='120px'; }
-    el.dataset.col=k; el.value=vals[k]||''; if(t==='signers'){ el.classList.add('ndain'); if(k==='sig'){ el.classList.add('sigin'); el.placeholder='Sign here'; } } el.addEventListener('input',()=>{ saveTable(t); }); td.appendChild(el); tr.appendChild(td); });
-  tb.appendChild(tr); }
+    el.dataset.col=k; el.value=vals[k]||''; if(t==='signers'){ el.classList.add('ndain'); } el.addEventListener('input',()=>{ if(t==='signers'){ const ix=[...tb.children].indexOf(tr); if(state.sigs&&state.sigs[ix]&&!state.nda){ delete state.sigs[ix]; renderSigCells(); } } saveTable(t); }); td.appendChild(el); tr.appendChild(td); });
+  if(t==='signers'){ const td=document.createElement('td'); td.className='sigcell'; tr.appendChild(td); }
+  tb.appendChild(tr); if(t==='signers' && typeof renderSigCells==='function') renderSigCells(); }
 function saveTable(t){ state['tbl_'+t]=[...document.querySelectorAll('[data-table="'+t+'"] tbody tr')].map(tr=>{ const o={}; tr.querySelectorAll('[data-col]').forEach(e=>o[e.dataset.col]=e.value); return o; }); persist(); }
 Object.keys(TABLES).forEach(t=>{ const rows=state['tbl_'+t]||[]; const n=Math.max(rows.length, t==='doctors'||t==='staff'||t==='signers'?(t==='signers'?2:3):(t==='normalisation'?2:1)); for(let i=0;i<n;i++) addRow(t, rows[i]); });
 document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{ const t=b.dataset.add; if(t==='signers' && document.querySelectorAll('[data-table="signers"] tbody tr').length>=4) return; addRow(t); saveTable(t); if(t==='signers') limitSigners(); });
@@ -427,41 +452,79 @@ const TERMS=[
  ['p','This agreement shall be continuing despite any conclusion or termination of discussions or negotiations.']
 ];
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-document.getElementById('sentDate').textContent=SENT;
+const SONIC=[{name:'George Southgate',title:'Authorised representative',id:'SCS-7F3A21C9'},{name:'[Second Sonic signatory]',title:'Authorised representative',id:'SCS-2B8E44D0'}];
+document.getElementById('sonicSigs').innerHTML=SONIC.map(x=>'<div class="sigframe"><div class="lbl">Signed by:</div><div class="img"><span class="ph">[Signature image from Sonic signing account]</span></div><div class="id">'+x.id+'</div><div class="who">'+esc(x.name)+'<small>'+x.title+', signed '+SENT+'</small></div></div>').join('');
+function rid(){ const a=new Uint8Array(4); (window.crypto||{getRandomValues:b=>b.map(()=>Math.random()*256)}).getRandomValues(a); return [...a].map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase(); }
+function renderSigCells(){ const rows=[...document.querySelectorAll('[data-table="signers"] tbody tr')];
+  rows.forEach((tr,ix)=>{ const c=tr.querySelector('.sigcell'); if(!c) return; const sg=(state.sigs||{})[ix];
+    if(sg){ c.innerHTML='<img src="'+sg.img+'" alt="Signature"><small>✓ Signed '+fmtDT(sg.at)+'</small>'; }
+    else if(state.nda){ c.innerHTML=''; }
+    else { c.innerHTML='<button type="button" class="btn s" style="padding:7px 14px">Sign</button>'; c.querySelector('button').onclick=()=>openSig(ix); } }); }
+// signature pad
+let sigIx=null, sigMode='draw', strokes=0;
+const pad=document.getElementById('sigPad'), pctx=pad.getContext('2d');
+function sizePad(){ const r=pad.getBoundingClientRect(), dpr=window.devicePixelRatio||1; pad.width=r.width*dpr; pad.height=r.height*dpr; pctx.setTransform(dpr,0,0,dpr,0,0); pctx.lineWidth=2.4; pctx.lineCap='round'; pctx.lineJoin='round'; pctx.strokeStyle='#0b1f4d'; strokes=0; }
+let drawing=false;
+pad.addEventListener('pointerdown',e=>{ drawing=true; pad.setPointerCapture(e.pointerId); const r=pad.getBoundingClientRect(); pctx.beginPath(); pctx.moveTo(e.clientX-r.left,e.clientY-r.top); });
+pad.addEventListener('pointermove',e=>{ if(!drawing) return; const r=pad.getBoundingClientRect(); pctx.lineTo(e.clientX-r.left,e.clientY-r.top); pctx.stroke(); strokes++; });
+['pointerup','pointerleave','pointercancel'].forEach(ev=>pad.addEventListener(ev,()=>{ drawing=false; }));
+document.getElementById('sigClear').onclick=sizePad;
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ sigMode=b.dataset.m; document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b)); document.getElementById('mDraw').classList.toggle('hide',sigMode!=='draw'); document.getElementById('mType').classList.toggle('hide',sigMode!=='type'); if(sigMode==='draw') sizePad(); });
+document.getElementById('sigTypeIn').addEventListener('input',e=>{ document.getElementById('sigPreview').textContent=e.target.value; });
+function sigErr(m){ const e=document.getElementById('sigErr'); e.textContent=m||''; e.classList.toggle('hide',!m); }
+function openSig(ix){ saveTable('signers'); const r=(state.tbl_signers||[])[ix]||{};
+  if(!(r.name||'').trim()) return ndaErr('Please enter the full name for row '+(ix+1)+' before signing.');
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test((r.email||'').trim())) return ndaErr('Please enter an email address for '+r.name+' before signing, so we can send their signed copy.');
+  ndaErr(''); sigIx=ix; sigErr(''); document.getElementById('sigWho').textContent='Signing as '+r.name.trim()+(r.role?', '+r.role:'')+' ('+r.email.trim()+')';
+  document.getElementById('sigTypeIn').value=r.name.trim(); document.getElementById('sigPreview').textContent=r.name.trim(); document.getElementById('sigConsent').checked=false;
+  document.getElementById('sigModal').classList.remove('hide'); sizePad(); }
+document.getElementById('sigCancel').onclick=()=>document.getElementById('sigModal').classList.add('hide');
+function typedImg(name){ const c=document.createElement('canvas'); c.width=900; c.height=220; const x=c.getContext('2d'); let fs=110; x.fillStyle='#0b1f4d';
+  do{ x.font=fs+'px "Brush Script MT","Segoe Script","Snell Roundhand",cursive'; fs-=6; } while(x.measureText(name).width>860 && fs>30); x.textBaseline='middle'; x.fillText(name,20,115); return c.toDataURL('image/png'); }
+document.getElementById('sigAdopt').onclick=()=>{ const r=(state.tbl_signers||[])[sigIx];
+  let img;
+  if(sigMode==='draw'){ if(strokes<3) return sigErr('Please draw your signature in the box.'); img=pad.toDataURL('image/png'); }
+  else { const t=document.getElementById('sigTypeIn').value.trim(); if(!t) return sigErr('Please type your full name.'); if(t.toLowerCase()!==r.name.trim().toLowerCase()) return sigErr('Please type your name exactly as entered: '+r.name.trim()); img=typedImg(t); }
+  if(!document.getElementById('sigConsent').checked) return sigErr('Please tick the box to agree to sign electronically.');
+  state.sigs=state.sigs||{}; state.sigs[sigIx]={img, method:sigMode==='draw'?'Drawn':'Typed', at:new Date().toISOString(), id:rid()+'-'+rid(), name:r.name.trim(), email:r.email.trim()};
+  persist(); document.getElementById('sigModal').classList.add('hide'); renderSigCells(); };
 document.getElementById('agrText').innerHTML='<p class="c">MUTUAL CONFIDENTIALITY AGREEMENT</p>'+TERMS.map(([t,x])=>t==='h'?'<h4>'+esc(x)+'</h4>':(t==='s'?'<p style="font-weight:700;margin-top:10px">'+esc(x)+'</p>':'<p class="'+t+'">'+esc(x)+'</p>')).join('');
 function signers(){ return (state.tbl_signers||[]).filter(r=>(r.name||'').trim()); }
 function fmtDT(iso){ const d=new Date(iso); return d.toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'})+' at '+d.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'}); }
 function ndaErr(m){ const e=document.getElementById('ndaErr'); e.textContent=m||''; e.classList.toggle('hide',!m); }
-function signNda(){
+async function docHash(){ const src=JSON.stringify({terms:TERMS,centre:state.trading_name,address:state.nda_address,signers:(state.nda||{}).signers,sonic:SONIC,sent:SENT}); try{ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(src)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase(); }catch(e){ return 'Calculated in the live portal'; } }
+async function signNda(){
   saveTable('signers');
   const s=signers();
   if(!(state.trading_name||'').trim()) return ndaErr('Please enter the medical centre name.');
   if(!(state.nda_address||'').trim()) return ndaErr('Please enter the practice address.');
   if(!s.length) return ndaErr('Please add at least one person covered by the agreement.');
-  for(const r of s){
+  const all=state.tbl_signers||[];
+  for(let ix=0; ix<all.length; ix++){ const r=all[ix]; if(!(r.name||'').trim()) continue;
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test((r.email||'').trim())) return ndaErr('Please enter an email address for '+r.name+' so we can send their signed copy.');
-    if((r.sig||'').trim().toLowerCase()!==r.name.trim().toLowerCase()) return ndaErr(r.name+': please type your full name in the signature box exactly as entered.');
+    if(!(state.sigs||{})[ix]) return ndaErr(r.name+' has not signed yet. Click Sign next to their name.');
   }
   if(!document.getElementById('ndaAgree').checked) return ndaErr('Please tick the box to confirm you have read the agreement.');
   ndaErr('');
-  state.nda={ at:new Date().toISOString(), ref:'MCA-'+Math.random().toString(36).slice(2,8).toUpperCase(), signers:s.map(r=>({name:r.name.trim(),role:r.role||'',email:r.email.trim()})) };
+  state.nda={ at:new Date().toISOString(), ref:'MCA-'+Math.random().toString(36).slice(2,8).toUpperCase(), signers:all.map((r,ix)=>[r,ix]).filter(([r])=>(r.name||'').trim()).map(([r,ix])=>({name:r.name.trim(),role:r.role||'',email:r.email.trim(),...state.sigs[ix]})) };
+  state.nda.hash=await docHash();
   // flow the address into the first location row
   const loc=state.tbl_locations||[]; if(!loc.length||!loc[0].addr){ const first=document.querySelector('[data-table="locations"] tbody tr [data-col="addr"]'); if(first){ first.value=state.nda_address; saveTable('locations'); } }
-  persist(); ndaView(); go(0);
+  persist(); ndaView(); go(1);
   document.getElementById('ndaDone').scrollIntoView({behavior:'smooth',block:'center'});
 }
 function ndaView(){
   const n=state.nda, done=document.getElementById('ndaDone');
   document.querySelectorAll('#nda .ndain').forEach(e=>{ e.readOnly=!!n; });
   document.getElementById('ndaAgree').checked=!!n; document.getElementById('ndaAgree').disabled=!!n;
-  limitSigners();
+  limitSigners(); renderSigCells();
   document.getElementById('ndaDoc').classList.toggle('hide',!n);
   if(!n){ done.classList.add('hide'); return; }
   const to=n.signers.map(x=>esc(x.email)).join(', ');
   const file='Mutual Confidentiality Agreement - '+esc(state.trading_name||'Practice')+'.pdf';
   document.getElementById('ndaDocFile').textContent='✓ '+file.replace(/&amp;/g,'&').replace(/&lt;/g,'<')+' (signed '+fmtDT(n.at)+')';
   done.classList.remove('hide');
-  done.innerHTML='<b class="t">✓ Agreement signed</b>Signed '+fmtDT(n.at)+' by '+n.signers.map(x=>esc(x.name)).join(', ')+'. Reference '+n.ref+'. A signed PDF copy has been emailed to you and to the Sonic valuation team, and saved in your Documents. You can now continue with the valuation.'
+  done.innerHTML='<b class="t">✓ Agreement signed</b>Signed '+fmtDT(n.at)+' by '+n.signers.map(x=>esc(x.name)).join(', ')+'. Reference '+n.ref+'. A signed PDF copy with its signing certificate has been emailed to you and to the Sonic valuation team, and saved in your Documents. You can now continue with the valuation.'
    +'<div class="mail"><div><span>To</span>'+to+'</div><div><span>Cc</span>Sonic Clinical Services valuation team</div><div><span>Subject</span>Your signed Mutual Confidentiality Agreement</div><div><span>Attached</span>'+file+'</div></div>'
    +'<div style="margin-top:12px"><button class="btn s" type="button" onclick="ndaDownload()">Download signed PDF</button></div>';
 }
@@ -477,14 +540,28 @@ function ndaPdf(){
   text('MEDICAL CENTRE: '+(state.trading_name||''),{style:'bold',size:11});
   text('Address: '+(state.nda_address||''),{size:11,after:5});
   text('Persons or companies covered by the Confidentiality Agreement. Signature/Agreement (by authorised representatives if applicable):',{style:'bold',after:3});
-  n.signers.forEach((s,i)=>{ page(); text((i+1)+'. '+s.name+(s.role?', '+s.role:''),{style:'bold',after:0.5});
-    text('Signed:',{after:-4}); text(s.name,{font:'times',style:'italic',size:17,ind:16,color:[11,42,99],after:1});
-    text('Signed electronically by '+s.name+' ('+s.email+') on '+fmtDT(n.at),{size:8.5,color:[91,107,117],ind:16,after:4}); });
-  y+=2; text('SIGNED BY MATRIX SKIN CANCER CLINICS PTY LTD (by two authorised representatives)',{style:'bold',after:3});
-  page(); const y0=y; d.setFont('times','italic'); d.setFontSize(17); d.setTextColor(11,42,99); d.text('Matthew Woollard',L,y0); d.text('George Southgate',L+62,y0);
-  d.setFont('helvetica','normal'); d.setFontSize(10); d.setTextColor(31,42,55); d.text('Name: Matthew Woollard',L,y0+6); d.text('Name: George Southgate',L+62,y0+6); d.text('Date: '+SENT,L+124,y0+6); y=y0+14;
+  const frame=(x,yy,img,id)=>{ d.setDrawColor(199,210,227); d.setLineWidth(0.3); d.roundedRect(x,yy,62,24,1.5,1.5); d.setDrawColor(17,49,110); d.setLineWidth(0.9); d.line(x,yy+0.6,x,yy+23.4);
+    d.setFont('helvetica','normal'); d.setFontSize(7); d.setTextColor(91,107,117); d.text('Signed by:',x+3,yy+3.6);
+    if(img){ try{ const p=d.getImageProperties(img); const h=13, w=Math.min(54,h*p.width/p.height); d.addImage(img,'PNG',x+3,yy+5,w,w*p.height/p.width>h?h:w*p.height/p.width); }catch(e){} }
+    else { d.setFont('helvetica','italic'); d.setFontSize(7.5); d.setTextColor(138,151,166); d.text('[Signature image from Sonic signing account]',x+3,yy+12); }
+    d.setFont('courier','normal'); d.setFontSize(6.5); d.setTextColor(91,107,117); d.text(id,x+3,yy+21.5); };
+  n.signers.forEach((s,i)=>{ if(y>245){ d.addPage(); y=20; } text((i+1)+'. '+s.name+(s.role?', '+s.role:''),{style:'bold',after:1});
+    frame(L,y,s.img,s.id); d.setFont('helvetica','normal'); d.setFontSize(9); d.setTextColor(31,42,55); d.text('Date: '+fmtDT(s.at),L+68,y+10); d.text(s.email,L+68,y+15); y+=30; });
+  if(y>235){ d.addPage(); y=20; }
+  y+=2; text('SIGNED BY MATRIX SKIN CANCER CLINICS PTY LTD (by two authorised representatives)',{style:'bold',after:2});
+  SONIC.forEach((x,i)=>{ frame(L+i*85,y,null,x.id); d.setFont('helvetica','normal'); d.setFontSize(9); d.setTextColor(31,42,55); d.text('Name: '+x.name,L+i*85,y+29); d.text('Date: '+SENT,L+i*85,y+34); }); y+=42;
   d.setDrawColor(150); d.setLineDashPattern([1,1],0); d.line(L,y,L+W,y); d.setLineDashPattern([],0); y+=8;
   TERMS.forEach(([t,x])=>{ if(t==='h'){ y+=2; text(x,{style:'bold',color:[17,49,110]}); } else if(t==='s'){ y+=2; text(x,{style:'bold'}); } else text(x,{ind:t==='a'?8:(t==='i'?16:0)}); });
+  // certificate of completion
+  d.addPage(); y=20; text('CERTIFICATE OF COMPLETION',{style:'bold',size:14,color:[17,49,110],after:4});
+  const kv=(k,v)=>{ page(); d.setFont('helvetica','bold'); d.setFontSize(9); d.setTextColor(91,107,117); d.text(k,L,y); d.setFont('helvetica','normal'); d.setTextColor(31,42,55); const ls=d.splitTextToSize(String(v),W-50); d.text(ls,L+50,y); y+=ls.length*4+1.5; };
+  kv('Agreement reference',n.ref); kv('Document','Mutual Confidentiality Agreement, '+(state.trading_name||'')); kv('Fingerprint (SHA-256)',n.hash||''); kv('Status','Completed'); kv('Sent by Sonic',SENT); kv('Completed',fmtDT(n.at)); kv('Signing platform','Sonic Clinical Services valuation portal');
+  y+=3; text('Signer events',{style:'bold',size:11,color:[17,49,110],after:2});
+  n.signers.forEach(s=>{ if(y>235){ d.addPage(); y=20; } d.setDrawColor(216,222,230); d.setLineWidth(0.3); d.line(L,y,L+W,y); y+=5;
+    text(s.name+(s.role?', '+s.role:''),{style:'bold',after:1}); const y1=y; frame(L+W-62,y1-1,s.img,s.id);
+    const kw=(k,v)=>{ d.setFont('helvetica','normal'); d.setFontSize(8.5); d.setTextColor(91,107,117); d.text(k,L,y); d.setTextColor(31,42,55); d.text(String(v),L+38,y); y+=4.3; };
+    kw('Email',s.email); kw('Signature adopted',s.method==='Drawn'?'Drawn on device':'Typed name, script style'); kw('Electronic signing','Consent accepted '+fmtDT(s.at)); kw('Signed',fmtDT(s.at)); kw('Signature ID',s.id); kw('Email verification','[One time code, live portal]'); kw('IP address','[Recorded in live portal]'); y=Math.max(y,y1+26)+2; });
+  SONIC.forEach(x=>{ if(y>250){ d.addPage(); y=20; } d.setDrawColor(216,222,230); d.line(L,y,L+W,y); y+=5; text(x.name+', Matrix Skin Cancer Clinics Pty Ltd',{style:'bold',after:1}); d.setFont('helvetica','normal'); d.setFontSize(8.5); d.setTextColor(31,42,55); d.text('Signed '+SENT+' before sending. Signature ID '+x.id,L,y); y+=7; });
   const pages=d.getNumberOfPages();
   for(let i=1;i<=pages;i++){ d.setPage(i); d.setFont('helvetica','normal'); d.setFontSize(7.5); d.setTextColor(91,107,117);
     d.text('Signed electronically through the Sonic Clinical Services valuation portal. Reference '+n.ref+'. Page '+i+' of '+pages+'.',L,290); }
@@ -500,16 +577,16 @@ function progress(){ const fields=[...document.querySelectorAll('[data-k]')]; co
   const docs=Object.keys(state.docs||{}).length; const pct=Math.round(100*(filled+docs)/(fields.length+5)); const p=Math.min(pct,100);
   document.getElementById('bar').style.width=p+'%'; document.getElementById('ptxt').textContent=p+'% complete'; }
 
-function go(i){ if(i>0 && !state.nda) i=0; cur=i; sections.forEach((s,j)=>s.classList.toggle('on',j===i));
-  [...nav.querySelectorAll('button')].forEach((b,j)=>{ b.classList.toggle('on',j===i); b.classList.toggle('done',j<i || (j===0 && !!state.nda)); b.disabled=(j>0 && !state.nda); });
+function go(i){ if(i>1 && !state.nda) i=1; cur=i; sections.forEach((s,j)=>s.classList.toggle('on',j===i));
+  [...nav.querySelectorAll('button')].forEach((b,j)=>{ b.classList.toggle('on',j===i); b.classList.toggle('done',j<i || (j===1 && !!state.nda)); b.disabled=(j>1 && !state.nda); });
   document.getElementById('foot').style.display=i>last?'none':'flex';
   document.getElementById('prev').style.visibility=i===0?'hidden':'visible';
-  document.getElementById('next').textContent=i===last?'Submit to Sonic':(i===0?(state.nda?'Continue':'Sign agreement'):(i===1?'Start':'Save and continue'));
-  document.getElementById('savebtn').style.display=i===0?'none':'';
+  document.getElementById('next').textContent=i===last?'Submit to Sonic':(i===0?'Start':(i===1?(state.nda?'Continue':'Finish signing'):'Save and continue'));
+  document.getElementById('savebtn').style.display=i<=1?'none':'';
   document.getElementById('next').className='btn '+(i===last?'r':'p');
   if(i===last) summary(); progress(); window.scrollTo(0,0); }
 document.getElementById('prev').onclick=()=>go(Math.max(0,cur-1));
-document.getElementById('next').onclick=()=>{ if(cur===last){ if(!document.getElementById('declare').checked){ alert('Please tick the declaration before submitting.'); return; } go(last+1); return; } if(cur===0 && !state.nda){ signNda(); return; } persist(); go(cur+1); };
+document.getElementById('next').onclick=()=>{ if(cur===last){ if(!document.getElementById('declare').checked){ alert('Please tick the declaration before submitting.'); return; } go(last+1); return; } if(cur===1 && !state.nda){ signNda(); return; } persist(); go(cur+1); };
 document.getElementById('savebtn').onclick=()=>{ persist(); alert('Your progress is saved. In the live portal you would get an email with a link to come back and finish.'); };
 document.addEventListener('input',progress);
 go(0);
